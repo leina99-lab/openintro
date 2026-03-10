@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1: 데이터 입문 (Introduction to Data)</title>
+
+<script src="https://sagecell.sagemath.org/static/embedded_sagecell.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (typeof sagecell !== 'undefined') {
+            sagecell.makeSagecell({
+                inputLocation:  'div.compute',
+                languages:      ["python"],
+                evalButtonText: '실습 실행 (Run)',
+                hide:           ["permalink", "fullScreen"], 
+                autoeval:       false 
+            });
+        } else {
+            // sagecell이 로드되지 않은 경우 재시도
+            var checkSagecell = setInterval(function() {
+                if (typeof sagecell !== 'undefined') {
+                    clearInterval(checkSagecell);
+                    sagecell.makeSagecell({
+                        inputLocation:  'div.compute',
+                        languages:      ["python"],
+                        evalButtonText: '실습 실행 (Run)',
+                        hide:           ["permalink", "fullScreen"], 
+                        autoeval:       false 
+                    });
+                }
+            }, 100);
+            // 10초 후 타임아웃
+            setTimeout(function() { clearInterval(checkSagecell); }, 10000);
+        }
+    });
+</script>
+
+<style>
+    body { font-family: "Pretendard", "Malgun Gothic", sans-serif; background-color: #f4f6f8; margin: 0; padding: 0; color: #333; line-height: 1.8; }
+    .container { max-width: 1000px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 100px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+    
+    /* 헤더 */
+    .header { background: linear-gradient(135deg, #1a5276 0%, #2c3e50 100%); color: white; padding: 50px 20px; text-align: center; }
+    .header h1 { margin: 0; font-size: 2.5em; font-weight: 700; }
+    .header p { color: #bdc3c7; margin-top: 10px; font-size: 1.1em; }
+
+    /* 목차 */
+    .toc { background: #ecf0f1; padding: 30px 40px; border-bottom: 1px solid #ddd; }
+    .toc h2 { color: #2c3e50; margin-bottom: 15px; font-size: 1.3em; }
+    .toc ul { list-style: none; padding: 0; margin: 0; }
+    .toc li { padding: 8px 0; border-bottom: 1px dashed #bdc3c7; }
+    .toc li:last-child { border-bottom: none; }
+    .toc a { color: #2980b9; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* 섹션 래퍼 */
+    .section-wrapper { padding: 40px; border-bottom: 1px solid #eee; }
+    .section-title { font-size: 1.8em; font-weight: bold; color: #1a5276; border-left: 5px solid #3498db; padding-left: 15px; margin-bottom: 25px; }
+    .subsection-title { font-size: 1.4em; font-weight: bold; color: #2c3e50; margin-top: 30px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #ecf0f1; }
+
+    /* 본문 스타일 */
+    .content { font-size: 1.05em; }
+    .content p { margin-bottom: 15px; text-align: justify; }
+    
+    /* 강조 박스 */
+    .highlight-box { background: #e8f6f3; border-left: 4px solid #1abc9c; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+    .highlight-box.warning { background: #fef9e7; border-left-color: #f39c12; }
+    .highlight-box.info { background: #ebf5fb; border-left-color: #3498db; }
+    .highlight-box.important { background: #fdedec; border-left-color: #e74c3c; }
+
+    /* 정의 박스 */
+    .definition-box { background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .definition-box .term { font-weight: bold; color: #2c3e50; font-size: 1.1em; margin-bottom: 10px; }
+
+    /* 예제 박스 */
+    .example-box { border: 2px solid #e0e0e0; border-radius: 12px; padding: 25px; margin: 25px 0; background: #fafafa; }
+    .ex-label { display: inline-block; background: #3498db; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.85em; font-weight: bold; margin-bottom: 15px; }
+    .ex-label.exercise { background: #e74c3c; }
+    .ex-title { font-size: 1.2em; font-weight: bold; color: #2c3e50; margin-bottom: 15px; display: block; }
+    .problem-desc { background: white; padding: 20px; border-left: 4px solid #3498db; margin-bottom: 20px; line-height: 1.7; }
+    
+    /* 퀴즈/정답 스타일 */
+    details.quiz { background: #e3f2fd; padding: 15px 20px; border-radius: 8px; cursor: pointer; border: 1px solid #90caf9; margin-top: 15px; }
+    details.quiz summary { font-weight: bold; color: #1565c0; outline: none; }
+    details.quiz summary:hover { color: #0d47a1; }
+    .answer { margin-top: 15px; padding: 15px; background: white; border-radius: 5px; color: #333; line-height: 1.7; }
+
+    /* 새로운 시각 박스 */
+    .new-perspective { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 12px; margin: 30px 0; }
+    .new-perspective h3 { margin-top: 0; font-size: 1.3em; border-bottom: 2px solid rgba(255,255,255,0.3); padding-bottom: 10px; }
+    .new-perspective p { margin-bottom: 12px; }
+    .new-perspective ul { margin: 10px 0; padding-left: 20px; }
+    .new-perspective li { margin-bottom: 8px; }
+
+    /* 표 스타일 */
+    .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.95em; }
+    .data-table th { background: #2c3e50; color: white; padding: 12px 15px; text-align: left; }
+    .data-table td { padding: 10px 15px; border-bottom: 1px solid #ddd; }
+    .data-table tr:nth-child(even) { background: #f8f9fa; }
+    .data-table tr:hover { background: #e8f4f8; }
+
+    /* 코드 블록 */
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 0.9em; color: #c0392b; }
+    
+    /* 수식 스타일 */
+    .formula { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; font-family: 'Times New Roman', serif; font-size: 1.1em; text-align: center; }
+
+    /* 네비게이션 */
+    .nav-bar { position: fixed; bottom: 20px; right: 20px; background: rgba(44, 62, 80, 0.95); color: white; padding: 15px 25px; border-radius: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 999; font-size: 0.9em; }
+
+    /* 인용문 */
+    blockquote { background: #f9f9f9; border-left: 4px solid #ccc; margin: 20px 0; padding: 15px 20px; font-style: italic; }
+    blockquote strong { color: #2c3e50; }
+
+    /* 이미지 플레이스홀더 */
+    .img-placeholder { width: 100%; height: 200px; background: #ecf0f1; display: flex; justify-content: center; align-items: center; color: #7f8c8d; border-radius: 8px; border: 2px dashed #bdc3c7; margin: 20px 0; }
+</style>
+</head>
+
+<body>
+
+<div class="nav-bar">▼ 스크롤하여 학습하기</div>
+
+<div class="container">
+
+    <div class="header">
+        <h1>Chapter 1: 데이터 입문</h1>
+        <p>Introduction to Data | OpenIntro Statistics 완전 정복</p>
+    </div>
+
+    <!-- 목차 -->
+    <div class="toc">
+        <h2> 목차</h2>
+        <ul>
+            <li><a href="#sec1-1">1.1 사례 연구: 뇌졸중 예방을 위한 스텐트 사용</a></li>
+            <li><a href="#sec1-2">1.2 데이터 기초</a></li>
+            <li><a href="#sec1-3">1.3 표본추출 원리와 전략</a></li>
+            <li><a href="#sec1-4">1.4 실험</a></li>
+            <li><a href="#exercises">연습문제</a></li>
+        </ul>
+    </div>
+
+    <!-- 서론 -->
+    <div class="section-wrapper">
+        <div class="section-title">서론</div>
+        <div class="content">
+            <p>과학자들은 엄격한 방법과 주의 깊은 관찰을 통해 질문에 답하고자 한다. 현장 노트, 설문조사, 실험 등에서 수집된 이러한 관찰 결과들이 통계적 조사의 근간을 이루며, 이를 <strong>데이터</strong>(data)라고 부른다.</p>
+            <p><strong>통계학</strong>(statistics)은 데이터를 가장 잘 수집하고, 분석하며, 결론을 도출하는 방법을 연구하는 학문이다. 이 첫 번째 장에서는 데이터의 속성과 수집 방법 모두에 초점을 맞춘다.</p>
+        </div>
+    </div>
+
+    <!-- 1.1 사례 연구 -->
+    <div class="section-wrapper" id="sec1-1">
+        <div class="section-title">1.1 사례 연구: 뇌졸중 예방을 위한 스텐트 사용</div>
+        
+        <div class="content">
+            <p>이 절에서는 통계학의 고전적인 과제인 의료 치료의 효능 평가를 소개한다. 뇌졸중 위험이 있는 환자들을 치료하는 데 있어 <strong>스텐트</strong>(stent)의 효과를 연구한 실험을 살펴볼 것이다.</p>
+            
+            <div class="highlight-box info">
+                <strong>핵심 연구 질문:</strong> 스텐트 사용이 뇌졸중 위험을 줄이는가?
+            </div>
+
+            <p>연구자들은 위험에 처한 451명의 환자를 대상으로 실험을 수행하였다. 각 지원자 환자는 무작위로 두 집단 중 하나에 배정되었다:</p>
+
+            <div class="definition-box">
+                <div class="term">치료군 (Treatment group)</div>
+                <p>스텐트와 의료 관리를 받은 환자군. 의료 관리에는 약물 투여, 위험 요인 관리, 생활 방식 개선 지원이 포함되었다. (224명)</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">대조군 (Control group)</div>
+                <p>치료군과 동일한 의료 관리를 받았지만, 스텐트는 받지 않은 환자군. (227명)</p>
+            </div>
+
+            <h3 class="subsection-title">요약 통계량 (Summary Statistics)</h3>
+            
+            <p><strong>요약 통계량</strong>은 대량의 데이터를 요약하는 단일 숫자이다. 1년 후 연구의 주요 결과는 다음과 같다:</p>
+
+            <table class="data-table">
+                <tr>
+                    <th>집단</th>
+                    <th>뇌졸중 환자 수</th>
+                    <th>총 환자 수</th>
+                    <th>뇌졸중 비율</th>
+                </tr>
+                <tr>
+                    <td>치료군 (스텐트)</td>
+                    <td>45</td>
+                    <td>224</td>
+                    <td>20%</td>
+                </tr>
+                <tr>
+                    <td>대조군</td>
+                    <td>28</td>
+                    <td>227</td>
+                    <td>12%</td>
+                </tr>
+            </table>
+
+            <div class="highlight-box warning">
+                <strong>놀라운 결과:</strong> 치료군에서 추가로 8%의 환자가 뇌졸중을 겪었다! 이것은 의사들의 예상(스텐트가 뇌졸중 발생률을 줄일 것)과 정반대되는 결과이다.
+            </div>
+        </div>
+
+        <!-- 예제 1.1 -->
+        <div class="example-box">
+            <span class="ex-label">예제 1.1</span>
+            <span class="ex-title">뇌졸중 비율 계산하기</span>
+            <div class="problem-desc">
+                치료군 224명 환자 중 45명이 첫 해 말까지 뇌졸중을 겪었다. 첫 해 말까지 뇌졸중을 겪은 치료군 환자의 비율을 계산하라.
+            </div>
+            <details class="quiz">
+                <summary> 풀이 보기</summary>
+                <div class="answer">
+                    <div class="formula">비율 = 45 / 224 = 0.2009 ≈ 20%</div>
+                    <p>따라서 치료군에서 약 20%의 환자가 첫 해 안에 뇌졸중을 겪었다.</p>
+                </div>
+            </details>
+            <div class="compute">
+# 치료군 뇌졸중 비율 계산
+treatment_stroke = 45
+treatment_total = 224
+control_stroke = 28
+control_total = 227
+
+# 비율 계산
+treatment_rate = treatment_stroke / treatment_total
+control_rate = control_stroke / control_total
+difference = treatment_rate - control_rate
+
+print("=== 스텐트 연구 결과 분석 ===")
+print(f"치료군 뇌졸중 비율: {treatment_rate:.4f} ({treatment_rate*100:.2f}%)")
+print(f"대조군 뇌졸중 비율: {control_rate:.4f} ({control_rate*100:.2f}%)")
+print(f"차이: {difference:.4f} ({difference*100:.2f}%p)")
+print(f"\n결론: 치료군이 오히려 {difference*100:.1f}%p 더 높은 뇌졸중 발생률을 보임")
+            </div>
+        </div>
+
+        <!-- 새로운 시각 -->
+        <div class="new-perspective">
+            <h3>🔍 새로운 시각: 연구 결과의 역설과 편향 없는 관찰의 중요성</h3>
+            <p>이 스텐트 연구는 통계학의 핵심 가치를 보여주는 완벽한 사례이다. 의사들과 연구자들은 스텐트가 뇌졸중 예방에 도움이 될 것이라는 <strong>사전 기대</strong>(prior expectation)를 가지고 있었다.</p>
+            <p>그러나 데이터는 기대와 정반대의 결과를 보여주었다. 이것이 바로 <strong>무작위 대조 실험</strong>(randomized controlled trial)의 힘이다.</p>
+            <p>역사적으로 많은 의학적 치료법들이 "상식적으로 효과가 있을 것 같다"는 이유로 사용되었다가, 엄격한 통계적 검증을 통해 효과가 없거나 심지어 해롭다는 것이 밝혀졌다:</p>
+            <ul>
+                <li><strong>방혈 요법</strong>: 수 세기 동안 다양한 질병의 치료법으로 사용되었으나, 실제로는 환자를 약화시켰다</li>
+                <li><strong>초기 호르몬 대체 요법</strong>: 심장 질환 예방에 효과적일 것으로 기대되었으나, 일부 환자군에서 오히려 위험을 증가시켰다</li>
+            </ul>
+            <p><strong>교훈:</strong> "상식"이나 "전문가 의견"보다 데이터를 신뢰하라. 통계학의 역할은 우리의 편견을 확인하는 것이 아니라, 현실을 객관적으로 드러내는 것이다.</p>
+        </div>
+    </div>
+
+    <!-- 1.2 데이터 기초 -->
+    <div class="section-wrapper" id="sec1-2">
+        <div class="section-title">1.2 데이터 기초 (Data Basics)</div>
+        
+        <div class="content">
+            <p>데이터의 효과적인 조직과 설명은 대부분의 분석에서 첫 번째 단계이다. 이 절에서는 데이터를 조직하기 위한 데이터 행렬과 다양한 형태의 데이터에 대한 용어를 소개한다.</p>
+        </div>
+
+        <h3 class="subsection-title">1.2.1 관측값, 변수, 데이터 행렬</h3>
+        
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">케이스 (Case) / 관측 단위 (Observational Unit)</div>
+                <p>데이터 행렬의 각 행을 나타내며, 단일 관측 대상을 의미한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">변수 (Variable)</div>
+                <p>각 케이스에 대한 특성을 나타내며, 데이터 행렬의 열에 해당한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">데이터 행렬 (Data Matrix)</div>
+                <p>데이터를 조직하는 편리하고 일반적인 방법. 각 행은 고유한 케이스에, 각 열은 변수에 해당한다.</p>
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.2.2 변수의 유형 (Types of Variables)</h3>
+
+        <div class="content">
+            <table class="data-table">
+                <tr>
+                    <th>변수 유형</th>
+                    <th>세부 유형</th>
+                    <th>설명</th>
+                    <th>예시</th>
+                </tr>
+                <tr>
+                    <td rowspan="2"><strong>수치형 (Numerical)</strong></td>
+                    <td>연속 (Continuous)</td>
+                    <td>연속적인 실수 값</td>
+                    <td>키, 몸무게, 온도</td>
+                </tr>
+                <tr>
+                    <td>이산 (Discrete)</td>
+                    <td>정수 값만 취함</td>
+                    <td>인구 수, 형제 수</td>
+                </tr>
+                <tr>
+                    <td rowspan="2"><strong>범주형 (Categorical)</strong></td>
+                    <td>명목형 (Nominal)</td>
+                    <td>순서 없는 범주</td>
+                    <td>성별, 혈액형, 국가</td>
+                </tr>
+                <tr>
+                    <td>순서형 (Ordinal)</td>
+                    <td>순서가 있는 범주</td>
+                    <td>교육 수준, 만족도</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 예제: 변수 유형 -->
+        <div class="example-box">
+            <span class="ex-label">예제 1.5</span>
+            <span class="ex-title">변수 유형 분류하기</span>
+            <div class="problem-desc">
+                통계학 수업에서 학생들에 대한 데이터를 수집하였다. 각 학생에 대해 세 가지 변수가 기록되었다: 형제자매 수, 학생 키, 이전에 통계학 수업을 수강한 적이 있는지 여부. 각 변수를 연속 수치형, 이산 수치형, 또는 범주형으로 분류하라.
+            </div>
+            <details class="quiz">
+                <summary> 풀이 보기</summary>
+                <div class="answer">
+                    <ul>
+                        <li><strong>형제자매 수</strong>: 개수이므로 <strong>이산 수치형</strong></li>
+                        <li><strong>학생 키</strong>: 연속적으로 변하므로 <strong>연속 수치형</strong></li>
+                        <li><strong>통계학 수강 여부</strong>: 두 범주(수강/미수강)로 분류되므로 <strong>범주형</strong></li>
+                    </ul>
+                </div>
+            </details>
+            <div class="compute">
+import pandas as pd
+
+# 학생 데이터 예시
+students = pd.DataFrame({
+    '형제자매_수': [2, 1, 3, 0, 2],        # 이산 수치형
+    '키_cm': [165.5, 178.2, 162.3, 180.0, 170.8],  # 연속 수치형
+    '통계학_수강_여부': ['예', '아니오', '예', '예', '아니오']  # 범주형
+})
+
+print("=== 학생 데이터셋 ===")
+print(students)
+
+print("\n=== 변수 유형 분류 ===")
+print("- 형제자매_수: 이산 수치형 (개수, 정수만 가능)")
+print("- 키_cm: 연속 수치형 (실수 값, 연속적 변화)")
+print("- 통계학_수강_여부: 범주형 (두 범주)")
+
+print("\n=== 기술통계 ===")
+print(f"형제자매 수 평균: {students['형제자매_수'].mean():.2f}")
+print(f"키 평균: {students['키_cm'].mean():.2f}cm")
+print(f"통계학 수강 비율: {(students['통계학_수강_여부'] == '예').mean()*100:.1f}%")
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.2.3 변수 간의 관계</h3>
+
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">연관 (Associated)</div>
+                <p>두 변수 사이에 어떤 관계가 있을 때, 이들은 연관되어 있다고 한다. 음의 연관(한 변수 증가 시 다른 변수 감소) 또는 양의 연관(함께 증가/감소)이 있을 수 있다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">독립 (Independent)</div>
+                <p>두 변수 사이에 명백한 관계가 없다면 독립적이라고 한다.</p>
+            </div>
+
+            <div class="highlight-box important">
+                <strong>중요:</strong> 한 쌍의 변수는 연관이거나 독립 둘 중 하나이다. 어떤 변수 쌍도 연관이면서 동시에 독립일 수 없다.
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.2.4 설명 변수와 반응 변수</h3>
+
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">설명 변수 (Explanatory Variable)</div>
+                <p>다른 변수에 인과적으로 영향을 미칠 수 있다고 의심되는 변수. 독립 변수라고도 한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">반응 변수 (Response Variable)</div>
+                <p>설명 변수의 영향을 받는다고 가정되는 변수. 종속 변수라고도 한다.</p>
+            </div>
+
+            <div class="highlight-box warning">
+                <strong>주의:</strong> 변수에 이런 방식으로 레이블을 붙이는 행위가 인과 관계의 존재를 보장하지 않는다. 인과 관계를 확인하기 위해서는 <strong>실험</strong>이 필요하다.
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.2.5 관찰 연구와 실험</h3>
+
+        <div class="content">
+            <table class="data-table">
+                <tr>
+                    <th>특성</th>
+                    <th>관찰 연구 (Observational Study)</th>
+                    <th>실험 (Experiment)</th>
+                </tr>
+                <tr>
+                    <td>처치 할당</td>
+                    <td>연구자가 간섭하지 않음</td>
+                    <td>연구자가 처치를 할당</td>
+                </tr>
+                <tr>
+                    <td>인과 추론</td>
+                    <td>불가능 (연관만 확인 가능)</td>
+                    <td>가능 (무작위 배정 시)</td>
+                </tr>
+                <tr>
+                    <td>예시</td>
+                    <td>설문조사, 의료 기록 검토</td>
+                    <td>임상 시험, A/B 테스트</td>
+                </tr>
+            </table>
+
+            <div class="highlight-box important">
+                <strong>연관 ≠ 인과:</strong> 일반적으로, 연관은 인과를 의미하지 않으며, 인과는 무작위 실험에서만 추론될 수 있다.
+            </div>
+        </div>
+
+        <!-- 새로운 시각: 인과 추론 -->
+        <div class="new-perspective">
+            <h3>🔍 새로운 시각: 인과 추론의 근본적 문제</h3>
+            <p><strong>인과 추론</strong>(causal inference)은 통계학에서 가장 도전적이면서도 중요한 주제 중 하나이다. "상관은 인과가 아니다"라는 문구는 통계학의 가장 중요한 경고이다.</p>
+            <p>왜 관찰 연구에서 인과 관계를 주장할 수 없는가? 그 이유는 <strong>혼란 변수</strong>(confounding variable)의 존재 때문이다.</p>
+            <p><strong>예시:</strong> 아이스크림 판매량과 익사 사고 수 사이에 강한 양의 상관관계가 있다. 그러나 아이스크림이 익사를 야기하는 것은 아니다. 두 변수 모두 <strong>기온</strong>이라는 제3의 변수에 의해 영향을 받는다.</p>
+            <p>무작위 실험이 이 문제를 해결하는 이유는 <strong>무작위 배정</strong>이 알려진 혼란 변수와 알려지지 않은 혼란 변수를 모두 균형있게 분배하기 때문이다.</p>
+        </div>
+
+        <!-- 변수 분석 실습 -->
+        <div class="example-box">
+            <span class="ex-label">실습</span>
+            <span class="ex-title">변수 유형과 관계 분석</span>
+            <div class="problem-desc">
+                county 데이터셋을 시뮬레이션하여 변수 유형을 분류하고, 변수 간 관계를 분석한다.
+            </div>
+            <div class="compute">
+import pandas as pd
+import numpy as np
+
+# county 데이터셋 시뮬레이션
+np.random.seed(123)
+n_counties = 100
+
+county_data = pd.DataFrame({
+    'name': [f'County_{i}' for i in range(n_counties)],
+    'state': np.random.choice(['CA', 'TX', 'FL', 'NY', 'PA'], n_counties),
+    'pop': np.random.randint(10000, 500000, n_counties),
+    'poverty': np.random.uniform(5, 25, n_counties),
+    'homeownership': np.random.uniform(50, 85, n_counties),
+    'multi_unit': np.random.uniform(5, 50, n_counties),
+    'metro': np.random.choice(['yes', 'no'], n_counties)
+})
+
+# 음의 상관관계 부여 (homeownership과 multi_unit)
+county_data['homeownership'] = 85 - 0.5 * county_data['multi_unit'] + np.random.normal(0, 5, n_counties)
+
+print("=== 변수 유형 분류 ===")
+print("\n수치형 변수:")
+print("  - pop: 이산형 (인구 수)")
+print("  - poverty: 연속형 (빈곤율)")
+print("  - homeownership: 연속형 (자가 소유율)")
+print("  - multi_unit: 연속형 (다세대 비율)")
+
+print("\n범주형 변수:")
+print(f"  - state: {county_data['state'].nunique()}개 수준")
+print(f"  - metro: {county_data['metro'].nunique()}개 수준")
+
+# 상관관계 분석
+corr = np.corrcoef(county_data['multi_unit'], county_data['homeownership'])[0, 1]
+print(f"\n=== 변수 간 관계 ===")
+print(f"homeownership vs multi_unit 상관계수: {corr:.4f}")
+if corr < -0.3:
+    print("해석: 강한 음의 연관 (다세대 비율↑ → 자가소유율↓)")
+elif corr < 0:
+    print("해석: 약한 음의 연관")
+else:
+    print("해석: 양의 연관 또는 독립")
+            </div>
+        </div>
+    </div>
+
+    <!-- 1.3 표본추출 원리와 전략 -->
+    <div class="section-wrapper" id="sec1-3">
+        <div class="section-title">1.3 표본추출 원리와 전략</div>
+
+        <h3 class="subsection-title">1.3.1 모집단과 표본</h3>
+        
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">모집단 (Population)</div>
+                <p>연구 질문이 참조하는 전체 대상 집합. 모집단의 모든 케이스에 대해 데이터를 수집하는 것은 종종 비용이 많이 든다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">표본 (Sample)</div>
+                <p>모집단에서 선택된 케이스의 부분집합. 표본 데이터를 사용하여 모집단에 대한 추정치를 제공한다.</p>
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.3.2 일화적 증거</h3>
+
+        <div class="content">
+            <div class="highlight-box warning">
+                <strong>일화적 증거 (Anecdotal Evidence):</strong> 무분별하게 수집된 데이터에 주의하라. 그러한 증거는 사실이고 검증 가능할 수 있지만, 특이한 케이스만을 나타낼 수 있다.
+            </div>
+            <p>일화적 증거는 일반적으로 그 특이한 특성 때문에 기억에 남는 비정상적인 케이스로 구성된다. 모집단을 대표하는 많은 케이스의 표본을 조사해야 한다.</p>
+        </div>
+
+        <!-- 새로운 시각: 인지 편향 -->
+        <div class="new-perspective">
+            <h3>🔍 새로운 시각: 인지 편향과 일화적 증거의 심리학</h3>
+            <p>왜 우리는 일화적 증거에 쉽게 설득되는가? 이것은 <strong>인지 편향</strong>(cognitive bias)과 관련이 있다.</p>
+            <ul>
+                <li><strong>가용성 휴리스틱</strong>: 쉽게 떠오르는 예시에 더 큰 중요성을 부여하는 경향</li>
+                <li><strong>확증 편향</strong>: 자신의 기존 믿음을 확인하는 정보를 선택적으로 찾고 기억하는 경향</li>
+                <li><strong>대표성 휴리스틱</strong>: 작은 표본이 전체 모집단을 대표한다고 가정하는 경향</li>
+            </ul>
+            <p>통계학은 이러한 인지적 함정을 피하기 위해 <strong>체계적인 데이터 수집</strong>과 <strong>객관적인 분석 방법</strong>을 사용한다.</p>
+        </div>
+
+        <h3 class="subsection-title">1.3.3 표본추출의 편향</h3>
+
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">단순 무작위 표본 (Simple Random Sample)</div>
+                <p>모집단의 각 케이스가 포함될 동등한 기회를 가지며, 한 케이스가 표본에 포함되어 있다는 것이 어떤 다른 케이스가 포함되어 있는지에 대한 정보를 제공하지 않는 표본.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">무응답 편향 (Non-response Bias)</div>
+                <p>무작위로 선택된 사람들 중 일부만 실제로 응답할 때, 결과가 전체 모집단을 대표하는지 불분명해지는 편향.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">편의 표본 (Convenience Sample)</div>
+                <p>쉽게 접근할 수 있는 개인이 표본에 포함될 가능성이 더 높은 표본. 모집단을 대표하지 않을 수 있다.</p>
+            </div>
+        </div>
+
+        <h3 class="subsection-title">1.3.5 네 가지 표본추출 방법</h3>
+
+        <div class="content">
+            <table class="data-table">
+                <tr>
+                    <th>방법</th>
+                    <th>설명</th>
+                    <th>장점</th>
+                    <th>단점</th>
+                </tr>
+                <tr>
+                    <td><strong>단순 무작위</strong></td>
+                    <td>모집단에서 동등한 확률로 선택</td>
+                    <td>가장 기본적, 편향 없음</td>
+                    <td>비용이 많이 들 수 있음</td>
+                </tr>
+                <tr>
+                    <td><strong>층화</strong></td>
+                    <td>모집단을 층으로 나눈 후 각 층에서 표본 추출</td>
+                    <td>각 하위집단 대표 보장</td>
+                    <td>분석이 복잡함</td>
+                </tr>
+                <tr>
+                    <td><strong>군집</strong></td>
+                    <td>군집을 선택하고 선택된 군집의 모든 관측값 포함</td>
+                    <td>비용 효율적</td>
+                    <td>군집 간 유사성 필요</td>
+                </tr>
+                <tr>
+                    <td><strong>다단계</strong></td>
+                    <td>군집 선택 후 각 군집 내에서 무작위 표본 추출</td>
+                    <td>비용과 대표성 균형</td>
+                    <td>설계 복잡</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 표본추출 방법 비교 실습 -->
+        <div class="example-box">
+            <span class="ex-label">예제 1.15</span>
+            <span class="ex-title">말라리아 연구: 표본추출 방법 선택</span>
+            <div class="problem-desc">
+                인도네시아 농촌의 열대 밀림 지역에서 말라리아 발생률을 추정하려 한다. 30개의 마을이 있으며, 각각은 다른 것과 거의 유사하다. 목표는 150명을 말라리아 검사하는 것이다. 어떤 표본추출 방법을 사용해야 하는가?
+            </div>
+            <details class="quiz">
+                <summary> 풀이 보기</summary>
+                <div class="answer">
+                    <p><strong>다단계 표본추출</strong>이 가장 적합하다. 마을의 절반(15개)을 무작위로 선택한 다음 각 마을에서 10명을 무작위로 선택한다. 이것은 단순 무작위 표본에 비해 데이터 수집 비용을 상당히 줄이면서도 신뢰할 수 있는 정보를 제공한다.</p>
+                </div>
+            </details>
+            <div class="compute">
+import numpy as np
+
+np.random.seed(42)
+
+# 30개 마을, 각 마을 약 100명
+n_villages = 30
+n_per_village = 100
+target_sample = 150
+
+print("=== 말라리아 연구: 표본추출 방법 비교 ===")
+
+# 1. 단순 무작위 표본추출
+print("\n1. 단순 무작위 표본추출 (SRS)")
+villages_visited_srs = set()
+for _ in range(target_sample):
+    village = np.random.randint(0, n_villages)
+    villages_visited_srs.add(village)
+print(f"   방문해야 할 마을 수: ~{len(villages_visited_srs)}개")
+print(f"   비용: 매우 높음 (거의 모든 마을 방문)")
+
+# 2. 군집 표본추출
+print("\n2. 군집 표본추출")
+n_clusters = 2  # 2개 마을 선택
+sample_cluster = n_per_village * n_clusters
+print(f"   선택된 마을 수: {n_clusters}개")
+print(f"   총 표본: {sample_cluster}명 (마을 전체)")
+print(f"   비용: 낮음 (2개 마을만 방문)")
+
+# 3. 다단계 표본추출 (권장)
+print("\n3. 다단계 표본추출 (권장)")
+n_clusters_multi = 15  # 마을의 절반 선택
+sample_per_cluster = 10  # 각 마을에서 10명
+print(f"   선택된 마을 수: {n_clusters_multi}개")
+print(f"   마을당 표본: {sample_per_cluster}명")
+print(f"   총 표본: {n_clusters_multi * sample_per_cluster}명")
+print(f"   비용: 중간 (SRS보다 낮고, 다양성 확보)")
+
+print("\n결론: 다단계 표본추출이 비용과 대표성 사이의 최적의 균형을 제공함")
+            </div>
+        </div>
+
+        <!-- 새로운 시각: 표본추출 -->
+        <div class="new-perspective">
+            <h3>🔍 새로운 시각: 표본추출 방법의 실제 적용</h3>
+            <p>실제 세계에서 표본추출 방법의 선택은 <strong>비용</strong>, <strong>정확성</strong>, <strong>실현 가능성</strong>의 균형을 맞춰야 한다.</p>
+            <ul>
+                <li><strong>여론조사</strong>: 층화 표본추출 - 지역, 연령대, 성별로 층화</li>
+                <li><strong>의료 연구</strong>: 군집 표본추출 - 환자가 집중된 병원을 군집으로 설정</li>
+                <li><strong>교육 연구</strong>: 다단계 표본추출 - 시·도 → 학교 → 학급 → 학생 순으로 선택</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 1.4 실험 -->
+    <div class="section-wrapper" id="sec1-4">
+        <div class="section-title">1.4 실험 (Experiments)</div>
+
+        <div class="content">
+            <p>연구자가 케이스에 처치를 할당하는 연구를 <strong>실험</strong>(experiment)이라고 한다. 이 할당이 무작위화를 포함할 때, 이를 <strong>무작위 실험</strong>(randomized experiment)이라고 한다.</p>
+        </div>
+
+        <h3 class="subsection-title">1.4.1 실험 설계의 원칙</h3>
+
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">통제 (Control)</div>
+                <p>연구자는 실험에서 잠재적으로 혼란을 주는 변수들을 통제하려고 노력해야 한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">무작위화 (Randomize)</div>
+                <p>환자를 무작위로 처치 집단에 배정함으로써 통제할 수 없는 변수들을 그룹 간에 균형있게 배분한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">반복 (Replicate)</div>
+                <p>대상들이 많을수록 개별적 변동이 평균화되어 처치 효과의 추정치가 더 정확해진다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">블로킹 (Block)</div>
+                <p>처치에 대한 반응에 영향을 미칠 것으로 알려진 변수가 있을 때, 먼저 개인을 유사한 그룹(블록)으로 나눈 후 각 블록 내에서 무작위화한다.</p>
+            </div>
+        </div>
+
+        <!-- 새로운 시각: 피셔의 원칙 -->
+        <div class="new-perspective">
+            <h3>🔍 새로운 시각: 피셔의 세 가지 실험 설계 원칙</h3>
+            <p>현대 실험 설계는 20세기 초 영국 통계학자 <strong>로널드 피셔</strong>(Ronald A. Fisher)의 연구에서 비롯되었다.</p>
+            <ul>
+                <li><strong>무작위화</strong>: "처치와 실험 단위 간의 관계를 우연에 맡긴다" - 이것이 비교를 공정하게 만든다.</li>
+                <li><strong>반복</strong>: "동일한 처치에 대한 여러 관측값" - 이것이 추정의 정밀도를 높인다.</li>
+                <li><strong>블로킹</strong>: "무엇을 통제할 수 있으면 블록화하고, 통제할 수 없으면 무작위화하라" - 이것이 알려진 변동 원인을 제거한다.</li>
+            </ul>
+        </div>
+
+        <h3 class="subsection-title">1.4.2 인체 실험에서 편향 줄이기</h3>
+
+        <div class="content">
+            <div class="definition-box">
+                <div class="term">위약 (Placebo)</div>
+                <p>가짜 처치. 효과적인 위약은 연구를 진정으로 맹검으로 만드는 핵심이다. 종종 위약은 환자에게 약간의 실제 개선을 가져오며, 이를 <strong>위약 효과</strong>라고 한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">맹검 (Blind)</div>
+                <p>연구자들이 환자에게 그들의 처치에 대해 알리지 않을 때, 그 연구는 맹검이라고 한다.</p>
+            </div>
+
+            <div class="definition-box">
+                <div class="term">이중 맹검 (Double-blind)</div>
+                <p>환자와 환자와 상호작용하는 의사나 연구자 모두 누가 처치를 받고 있고 누가 받지 않는지 모르는 설정.</p>
+            </div>
+        </div>
+
+        <!-- 실험 설계 시뮬레이션 -->
+        <div class="example-box">
+            <span class="ex-label">실습</span>
+            <span class="ex-title">임상 시험 시뮬레이션: 혈압 약 효과 검증</span>
+            <div class="problem-desc">
+                블로킹을 사용한 무작위 실험을 시뮬레이션하여 새로운 혈압 약의 효과를 검증한다.
+            </div>
+            <div class="compute">
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+np.random.seed(42)
+
+# 실험 설계 파라미터
+n_patients = 200
+
+# 환자 특성 생성 (블로킹을 위한 위험 수준)
+risk_levels = np.random.choice(['low', 'high'], n_patients, p=[0.6, 0.4])
+
+# 블로킹을 사용한 무작위 배정
+def blocked_randomization(risk_levels):
+    assignments = np.empty(len(risk_levels), dtype=object)
+    
+    for risk in ['low', 'high']:
+        risk_idx = np.where(risk_levels == risk)[0]
+        n_risk = len(risk_idx)
+        
+        # 각 블록 내에서 절반씩 무작위 배정
+        treatment_idx = np.random.choice(risk_idx, n_risk // 2, replace=False)
+        assignments[treatment_idx] = 'treatment'
+        control_idx = np.setdiff1d(risk_idx, treatment_idx)
+        assignments[control_idx] = 'control'
+    
+    return assignments
+
+group_assignment = blocked_randomization(risk_levels)
+
+# 기저 혈압
+baseline_bp = np.where(risk_levels == 'high', 
+                       np.random.normal(160, 10, n_patients),
+                       np.random.normal(145, 10, n_patients))
+
+# 처치 효과
+true_treatment_effect = -15  # 치료군: 평균 15mmHg 감소
+placebo_effect = -5          # 대조군: 5mmHg 감소 (위약 효과)
+
+bp_change = np.where(group_assignment == 'treatment',
+                     np.random.normal(true_treatment_effect, 8, n_patients),
+                     np.random.normal(placebo_effect, 8, n_patients))
+
+# 데이터프레임 생성
+trial_data = pd.DataFrame({
+    'risk_level': risk_levels,
+    'group': group_assignment,
+    'baseline_bp': baseline_bp,
+    'bp_change': bp_change
+})
+
+print("=== 임상 시험 시뮬레이션: 혈압 약 효과 검증 ===")
+
+# 1. 블로킹 확인
+print("\n1. 블로킹 확인 (위험 수준별 집단 분포):")
+print(pd.crosstab(trial_data['risk_level'], trial_data['group']))
+
+# 2. 처치 효과 분석
+print("\n2. 처치 효과 분석:")
+treatment_change = trial_data[trial_data['group'] == 'treatment']['bp_change']
+control_change = trial_data[trial_data['group'] == 'control']['bp_change']
+
+print(f"   치료군 혈압 변화: {treatment_change.mean():.2f} ± {treatment_change.std():.2f} mmHg")
+print(f"   대조군 혈압 변화: {control_change.mean():.2f} ± {control_change.std():.2f} mmHg")
+
+# 3. 통계적 검정
+t_stat, p_value = stats.ttest_ind(treatment_change, control_change)
+effect_size = treatment_change.mean() - control_change.mean()
+
+print(f"\n3. 통계적 검정 결과:")
+print(f"   처치 효과 (차이): {effect_size:.2f} mmHg")
+print(f"   t-통계량: {t_stat:.3f}")
+print(f"   p-값: {p_value:.6f}")
+
+if p_value < 0.05:
+    print(f"\n결론: 통계적으로 유의한 차이 있음 (위약 대비 {abs(effect_size):.1f}mmHg 추가 감소)")
+            </div>
+        </div>
+    </div>
+
+    <!-- 연습문제 -->
+    <div class="section-wrapper" id="exercises">
+        <div class="section-title">연습문제</div>
+
+        <!-- 연습문제 1.1 -->
+        <div class="example-box">
+            <span class="ex-label exercise">연습문제 1.1</span>
+            <span class="ex-title">편두통과 침술 (Migraine and Acupuncture)</span>
+            <div class="problem-desc">
+                편두통 치료를 위한 침술의 효과를 연구하였다. 89명의 여성을 두 집단에 무작위 배정하였다: 치료군(43명)은 편두통 치료용 침술을, 대조군(46명)은 위약 침술(비경혈 위치)을 받았다. 24시간 후 결과는 다음과 같다:
+                <br><br>
+                <table class="data-table">
+                    <tr><th></th><th>통증 없음</th><th>통증 있음</th><th>합계</th></tr>
+                    <tr><td>치료군</td><td>10</td><td>33</td><td>43</td></tr>
+                    <tr><td>대조군</td><td>2</td><td>44</td><td>46</td></tr>
+                </table>
+                <br>
+                (a) 치료군에서 통증이 없는 환자의 비율은?<br>
+                (b) 대조군에서 통증이 없는 환자의 비율은?<br>
+                (c) 어느 집단에서 더 높은 통증 완화율을 보이는가?<br>
+                (d) 관찰된 차이에 대한 다른 가능한 설명은?
+            </div>
+            <details class="quiz">
+                <summary> 풀이 보기</summary>
+                <div class="answer">
+                    <p>(a) 치료군 통증 완화율: 10/43 = 23.3%</p>
+                    <p>(b) 대조군 통증 완화율: 2/46 = 4.3%</p>
+                    <p>(c) 치료군에서 더 높은 비율의 환자가 통증이 없었다 (23.3% > 4.3%)</p>
+                    <p>(d) 관찰된 차이가 단순히 <strong>우연</strong>(chance variation) 때문일 가능성이 있다. 무작위 변동으로 인해 한 집단에서 더 좋은 결과가 나타날 수 있다.</p>
+                </div>
+            </details>
+            <div class="compute">
+import numpy as np
+from scipy.stats import chi2_contingency
+
+# 데이터 정의
+treatment_pain_free = 10
+treatment_total = 43
+control_pain_free = 2
+control_total = 46
+
+# 비율 계산
+treatment_rate = treatment_pain_free / treatment_total
+control_rate = control_pain_free / control_total
+difference = treatment_rate - control_rate
+
+print("=== 편두통 침술 연구 결과 분석 ===")
+print(f"(a) 치료군 통증 완화율: {treatment_rate:.4f} ({treatment_rate*100:.2f}%)")
+print(f"(b) 대조군 통증 완화율: {control_rate:.4f} ({control_rate*100:.2f}%)")
+print(f"(c) 차이: {difference:.4f} ({difference*100:.2f}%p)")
+print(f"    치료군이 {difference*100:.1f}%p 더 높은 통증 완화율을 보임")
+
+# 카이제곱 검정
+observed = np.array([[10, 33], [2, 44]])
+chi2, p_value, dof, expected = chi2_contingency(observed)
+
+print(f"\n(d) 카이제곱 검정 결과:")
+print(f"    카이제곱 통계량: {chi2:.4f}")
+print(f"    p-값: {p_value:.4f}")
+if p_value < 0.05:
+    print("    p < 0.05: 통계적으로 유의한 차이가 있음")
+else:
+    print("    p >= 0.05: 차이가 우연에 의한 것일 수 있음")
+            </div>
+        </div>
+
+        <!-- 연습문제: 피셔의 붓꽃 -->
+        <div class="example-box">
+            <span class="ex-label exercise">연습문제 1.9</span>
+            <span class="ex-title">피셔의 붓꽃 (Fisher's Irises)</span>
+            <div class="problem-desc">
+                로널드 피셔 경은 세 종의 붓꽃(setosa, versicolor, virginica)에서 꽃받침 길이와 너비, 꽃잎 길이와 너비를 포함하는 데이터셋을 다루었다. 각 종에서 50송이의 꽃이 데이터셋에 있다.
+                <br><br>
+                (a) 데이터에 몇 개의 케이스가 포함되었는가?<br>
+                (b) 몇 개의 수치 변수가 데이터에 포함되었는가?<br>
+                (c) 몇 개의 범주형 변수가 데이터에 포함되었는가?
+            </div>
+            <details class="quiz">
+                <summary> 풀이 보기</summary>
+                <div class="answer">
+                    <p>(a) 50 × 3 = <strong>150개</strong>의 케이스</p>
+                    <p>(b) <strong>4개</strong>의 연속 수치 변수: 꽃받침 길이, 꽃받침 너비, 꽃잎 길이, 꽃잎 너비</p>
+                    <p>(c) <strong>1개</strong>의 범주형 변수: 종 (species) - setosa, versicolor, virginica 세 수준</p>
+                </div>
+            </details>
+            <div class="compute">
+from sklearn.datasets import load_iris
+import pandas as pd
+
+# 붓꽃 데이터 로드
+iris = load_iris()
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+df['species'] = [iris.target_names[i] for i in iris.target]
+
+print("=== 피셔의 붓꽃 데이터셋 ===")
+print(f"\n(a) 케이스 수: {len(df)}개 (50개 × 3종)")
+
+print("\n(b) 수치 변수 (4개, 모두 연속형):")
+for var in iris.feature_names:
+    print(f"    - {var}")
+
+print("\n(c) 범주형 변수 (1개):")
+print(f"    - species: {', '.join(iris.target_names)}")
+
+# 기술통계
+print("\n=== 종별 평균 ===")
+print(df.groupby('species')[iris.feature_names].mean().round(2))
+            </div>
+        </div>
+    </div>
+
+    <!-- 마무리 -->
+    <div style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h2> Chapter 1 완료!</h2>
+        <p>데이터의 기초, 변수 유형, 표본추출, 실험 설계의 핵심 개념을 학습하였다.</p>
+        <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.8;">
+            핵심 교훈: "상관은 인과가 아니다" | 무작위 실험만이 인과를 증명할 수 있다
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>
